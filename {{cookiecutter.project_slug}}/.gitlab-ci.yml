@@ -1,8 +1,8 @@
 image: tiangolo/docker-with-compose
 
 before_script:
-  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   - pip install docker-auto-labels
+  - docker login -u $REGISTRY_USER -p $REGISTRY_PASSWORD $DOCKER_REGISTRY
 
 stages:
   - test
@@ -23,6 +23,7 @@ build-stag:
     - TAG=stag FRONTEND_ENV=staging sh ./scripts/build-push.sh
   only:
     - master
+    - staging
   tags:
     - build
     - test
@@ -51,9 +52,12 @@ deploy-stag:
     url: https://{{cookiecutter.domain_staging}}
   only:
     - master
+    - staging
   tags:
     - swarm
     - stag
+  when: manual
+
 
 deploy-prod:
   stage: deploy
@@ -72,3 +76,4 @@ deploy-prod:
   tags:
     - swarm
     - prod
+  when: manual
